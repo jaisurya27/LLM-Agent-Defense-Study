@@ -1,0 +1,27 @@
+{
+  "config_id": "prelim-v1",
+  "frozen": false,
+  "notes": "PROPOSED settings, not yet agreed by the team. The batch command refuses to run until frozen is true. After the freeze, any change to this file, tasks.json, the warning text or the defense code needs a new config_id and a separate results folder.",
+  "benchmark_version": "v1.2.2",
+  "agentdojo_version": "0.1.35",
+  "model": {
+    "provider": "openai",
+    "model_id": "gpt-4o-mini-2024-07-18",
+    "temperature": 0.0
+  },
+  "episode_limits": {
+    "max_tool_iterations": 15
+  },
+  "attack": {
+    "name": "important_instructions",
+    "user_name": "Emma Johnson",
+    "model_name": "GPT-4"
+  },
+  "defenses": ["default", "warning", "warning_boundaries"],
+  "selection": {
+    "seed": 261,
+    "suites": ["banking", "slack"],
+    "user_tasks_per_suite": 3
+  },
+  "max_infrastructure_retries": 1
+}

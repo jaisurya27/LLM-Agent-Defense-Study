@@ -1,0 +1,8 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+# Offline checks use a scripted stand-in for the model. They are not results.
+results/offline_check/
