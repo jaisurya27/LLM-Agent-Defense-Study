@@ -120,3 +120,26 @@ def test_infrastructure_failure_is_recorded_and_retried_once(results_root, monke
 def test_batch_refuses_unfrozen_config(results_root):
     with pytest.raises(SystemExit):
         runner.run_phase("batch", {**CONFIG, "frozen": False}, TASKS, offline=None, dry_run=False)
+
+
+def test_unfilled_model_settings_stop_before_any_api_call(results_root):
+    cfg = {**CONFIG, "model": {**CONFIG["model"], "model_id": "SET-YOUR-DEPLOYMENT-NAME"}}
+    with pytest.raises(SystemExit):
+        runner.run_phase("smoke", cfg, TASKS, offline=None, dry_run=False)
+    assert not (results_root / "results").exists()
+
+
+def test_content_filter_block_is_recorded_and_not_retried(results_root, monkeypatch):
+    class FilterBlock(Exception):
+        code = "content_filter"
+    FilterBlock.__module__ = "openai"
+
+    def blocked(self, *args, **kwargs):
+        raise FilterBlock("filtered by the provider's content policy")
+
+    monkeypatch.setattr(runner.ScriptedLLM, "query", blocked)
+    runner.run_phase("smoke", CONFIG, TASKS, offline="reference", dry_run=False)
+    runner.run_phase("smoke", CONFIG, TASKS, offline="reference", dry_run=False)
+    records = [json.loads(line) for line in (results_root / "results/offline_check/smoke/episodes.jsonl").read_text().splitlines()]
+    assert len(records) == 2  # one per episode, no retries
+    assert all(r["termination_reason"] == "content_filter" and r["utility_success"] is None for r in records)

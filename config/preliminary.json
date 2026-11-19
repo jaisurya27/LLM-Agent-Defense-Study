@@ -1,13 +1,18 @@
 {
   "config_id": "prelim-v1",
   "frozen": false,
-  "notes": "PROPOSED settings, not yet agreed by the team. The batch command refuses to run until frozen is true. After the freeze, any change to this file, tasks.json, the warning text or the defense code needs a new config_id and a separate results folder.",
+  "notes": "PROPOSED settings, not yet agreed by the team. The batch command refuses to run until frozen is true. After the freeze, any change to this file, tasks.json, the warning text or the defense code needs a new config_id and a separate results folder. On Azure, model_id is the deployment name; record the model and version behind it in underlying_model, and the deployment's content filter (guardrail) settings in content_filter.",
   "benchmark_version": "v1.2.2",
   "agentdojo_version": "0.1.35",
   "model": {
-    "provider": "openai",
-    "model_id": "gpt-4o-mini-2024-07-18",
-    "temperature": 0.0
+    "provider": "openai_compatible",
+    "base_url": "https://ta-agent1.openai.azure.com/openai/v1",
+    "api_key_env": "AZURE_OPENAI_API_KEY",
+    "model_id": "gpt-4.1-nano",
+    "underlying_model": "gpt-4.1-nano (version: record from the Deployments page before the freeze)",
+    "content_filter": "Default (to confirm before the freeze)",
+    "temperature": 0.0,
+    "reasoning_effort": null
   },
   "episode_limits": {
     "max_tool_iterations": 15
@@ -17,10 +22,17 @@
     "user_name": "Emma Johnson",
     "model_name": "GPT-4"
   },
-  "defenses": ["default", "warning", "warning_boundaries"],
+  "defenses": [
+    "default",
+    "warning",
+    "warning_boundaries"
+  ],
   "selection": {
     "seed": 261,
-    "suites": ["banking", "slack"],
+    "suites": [
+      "banking",
+      "slack"
+    ],
     "user_tasks_per_suite": 3
   },
   "max_infrastructure_retries": 1

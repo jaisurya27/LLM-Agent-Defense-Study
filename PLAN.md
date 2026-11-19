@@ -45,12 +45,13 @@ Built now so nobody waits; each owner can replace their part.
 
 These are proposals in `config/preliminary.json`, not final choices.
 
-1. **Model: `gpt-4o-mini-2024-07-18`.** A pinned snapshot, cheap, supported by AgentDojo. OpenAI lists it for shutdown on 14 Jan 2027, so runs must finish before then. An older model is also more likely to show some baseline attack success; if the default agent is never attacked successfully, we cannot measure any benefit from the defenses. The integration check will give a first indication.
+1. **Model: Azure OpenAI deployment on `ta-agent1`.** Record the deployment name, the model and version behind it, and its content filter in the config. Earlier proposal was `gpt-4o-mini-2024-07-18`: A pinned snapshot, cheap, supported by AgentDojo. OpenAI lists it for shutdown on 14 Jan 2027, so runs must finish before then. An older model is also more likely to show some baseline attack success; if the default agent is never attacked successfully, we cannot measure any benefit from the defenses. The integration check will give a first indication.
 2. **Temperature 0.0.** AgentDojo 0.1.35 silently drops a temperature of 0.0 for OpenAI models and the API then uses 1.0. The runner sets it explicitly, so 0.0 is what is sent.
 3. **Episode limit: 15 tool rounds** (AgentDojo's default). No separate token cap yet; the smoke test will show whether one is needed.
 4. **Attack names.** The payload addresses the model as "GPT-4" and signs as "Emma Johnson", which is what AgentDojo uses for this model. If the model changes, decide whether to regenerate the payloads.
 5. **Budget.** 36 short episodes on this model should cost very little, but the estimate should come from the smoke test's token counts.
-6. **Tool errors are not wrapped** in boundaries (see README). De to decide whether this needs fixing before the freeze.
+6. **Azure content filter.** Prompt Shields for user-prompt attacks are on by default on Azure deployments; detection for attacks in documents is off by default. If Azure blocks our attacked episodes, it is acting as an extra defense in every configuration. Check the smoke test for `content_filter`; for the batch, the team should agree on the guardrail setting (ideally annotate-only) and record it.
+7. **Tool errors are not wrapped** in boundaries (see README). De to decide whether this needs fixing before the freeze.
 
 ## 5. Rules built into the runner
 

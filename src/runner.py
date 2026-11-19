@@ -70,6 +70,13 @@ def is_infrastructure_error(exc: BaseException) -> bool:
     return module in ("openai", "anthropic", "httpx", "httpcore", "tenacity")
 
 
+def is_content_filter_block(exc: BaseException) -> bool:
+    """Azure rejects a request with error code 'content_filter' when its own
+    filters (for example Prompt Shields) flag the input. That is a platform
+    safety layer, not an outage, so it is recorded but not retried."""
+    return getattr(exc, "code", None) == "content_filter" or "content_filter" in str(getattr(exc, "body", "") or "")
+
+
 def termination_reason(messages: list) -> str:
     if not messages:
         return "no_messages"
@@ -146,12 +153,19 @@ def run_episode(episode: dict, config: dict, out_dir: Path, attempt: int, offlin
         record["attack_success"] = bool(attack_succeeded) if attacked else None
     except Exception as exc:  # recorded, never counted as a successful defense
         record["status"] = "infrastructure_error" if is_infrastructure_error(exc) else "evaluation_error"
+        if is_content_filter_block(exc):
+            record["termination_reason"] = "content_filter"
         record["error_message"] = f"{type(exc).__name__}: {exc}"[:2000]
         error_traceback = traceback.format_exc()
     record["runtime_seconds"] = round(time.monotonic() - start, 3)
 
     messages = capture.attempts[-1] if capture.attempts else []
-    record["termination_reason"] = "error" if record["status"] != "completed" else termination_reason(messages)
+    if record["status"] != "completed":
+        record["termination_reason"] = record["termination_reason"] or "error"
+    elif any(call.get("finish_reason") == "content_filter" for call in meter.calls):
+        record["termination_reason"] = "content_filter"
+    else:
+        record["termination_reason"] = termination_reason(messages)
     if not offline:
         record["input_tokens"] = meter.total("input_tokens")
         record["output_tokens"] = meter.total("output_tokens")
@@ -210,6 +224,9 @@ def run_phase(phase: str, config: dict, tasks: dict, offline: str | None, dry_ru
             print(f"{e['case_id']:45} {e['defense']}")
         print(f"{len(episodes)} episodes planned -> {out_dir.relative_to(ROOT)}")
         return
+    unset = [k for k, v in config["model"].items() if isinstance(v, str) and v.startswith("SET-")]
+    if not offline and unset:
+        raise SystemExit(f"Fill in these fields in config/preliminary.json first: {', '.join('model.' + k for k in unset)}")
     if phase == "batch" and not offline and not config.get("frozen"):
         raise SystemExit("config/preliminary.json is not frozen. Agree the settings with the team, set \"frozen\": true, commit, then launch the batch.")
 
@@ -227,7 +244,9 @@ def run_phase(phase: str, config: dict, tasks: dict, offline: str | None, dry_ru
         while True:
             # Never rerun an evaluated episode. Retry only infrastructure
             # failures, and at most max_retries times.
-            if earlier and (earlier[-1]["status"] != "infrastructure_error" or len(earlier) > max_retries):
+            if earlier and (earlier[-1]["status"] != "infrastructure_error"
+                            or earlier[-1]["termination_reason"] == "content_filter"
+                            or len(earlier) > max_retries):
                 break
             record = run_episode(episode, config, out_dir, len(earlier) + 1, offline, fingerprint)
             with episodes_path.open("a", encoding="utf-8") as f:
@@ -235,7 +254,8 @@ def run_phase(phase: str, config: dict, tasks: dict, offline: str | None, dry_ru
             records.append(record)
             earlier.append(record)
             write_selection(out_dir, records)
-            consecutive_failures = consecutive_failures + 1 if record["status"] == "infrastructure_error" else 0
+            blocked = record["termination_reason"] == "content_filter"
+            consecutive_failures = consecutive_failures + 1 if record["status"] == "infrastructure_error" and not blocked else 0
             print(f"{record['status']:21} utility={record['utility_success']!s:5} attack={record['attack_success']!s:5} "
                   f"{record['case_id']} / {record['defense']}"
                   + (f"  [{record['error_message'][:80]}]" if record["error_message"] else ""))

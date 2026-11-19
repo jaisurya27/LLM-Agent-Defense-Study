@@ -1,0 +1,35 @@
+{
+  "rule": "latest attempt per case_id and defense",
+  "selected": {
+    "banking__user_task_13__clean__default": {
+      "run_id": "banking__user_task_13__clean__default__20261119T074301Z_bcef",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_13__clean__warning": {
+      "run_id": "banking__user_task_13__clean__warning__20261119T074306Z_272e",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_13__clean__warning_boundaries": {
+      "run_id": "banking__user_task_13__clean__warning_boundaries__20261119T074309Z_0ab4",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_13__injection_task_0__default": {
+      "run_id": "banking__user_task_13__injection_task_0__default__20261119T074313Z_35b2",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_13__injection_task_0__warning": {
+      "run_id": "banking__user_task_13__injection_task_0__warning__20261119T074320Z_3a7e",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_13__injection_task_0__warning_boundaries": {
+      "run_id": "banking__user_task_13__injection_task_0__warning_boundaries__20261119T074325Z_2ae3",
+      "status": "completed",
+      "attempt": 1
+    }
+  }
+}

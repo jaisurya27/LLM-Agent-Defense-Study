@@ -1,0 +1,15 @@
+{
+  "rule": "latest attempt per case_id and defense",
+  "selected": {
+    "banking__user_task_13__clean__default": {
+      "run_id": "banking__user_task_13__clean__default__20261119T072330Z_f75f",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_13__injection_task_0__default": {
+      "run_id": "banking__user_task_13__injection_task_0__default__20261119T072336Z_c0c0",
+      "status": "completed",
+      "attempt": 1
+    }
+  }
+}

@@ -16,6 +16,19 @@ pip install -r requirements.txt
 cp .env.example .env        # then add your API key; .env is git-ignored
 ```
 
+### Model (Azure OpenAI)
+
+The config uses our Azure OpenAI resource through its OpenAI-compatible endpoint (`https://ta-agent1.openai.azure.com/openai/v1`). In `config/preliminary.json`, set:
+
+- `model_id`: the **deployment name** from Azure AI Foundry (Deployments page), not the model name.
+- `underlying_model`: the model and version behind that deployment, for example `gpt-4o-mini (2024-07-18)`.
+- `content_filter`: the guardrail/content filter assigned to the deployment.
+- `temperature`: `0.0` for GPT-4o-family models. Reasoning models (o-series, GPT-5 family) reject a temperature; use `null` for those.
+
+The runner refuses to call the API while any of these still read `SET-...`.
+
+Azure can block a request with its own content filter (Prompt Shields). That works like an extra, uncontrolled defense, so a blocked episode is recorded with `termination_reason: "content_filter"`, its outcomes stay null, and it is not retried. Blocks of the model's reply show up as `finish_reason: "content_filter"` in the trace.
+
 `requirements.txt` pins `agentdojo==0.1.35`, which provides benchmark version v1.2.2.
 
 ## Check your setup (no key, no cost)

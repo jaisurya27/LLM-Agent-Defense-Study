@@ -32,8 +32,10 @@ class UsageMeter:
 
     calls: list[dict] = field(default_factory=list)
 
-    def add(self, input_tokens: int | None, output_tokens: int | None) -> None:
-        self.calls.append({"input_tokens": input_tokens, "output_tokens": output_tokens})
+    def add(self, input_tokens: int | None, output_tokens: int | None, finish_reason: str | None = None,
+            reasoning_tokens: int | None = None) -> None:
+        self.calls.append({"input_tokens": input_tokens, "output_tokens": output_tokens,
+                           "reasoning_tokens": reasoning_tokens, "finish_reason": finish_reason})
 
     def total(self, key: str) -> int | None:
         values = [c[key] for c in self.calls]
@@ -114,11 +116,17 @@ def build_llm(model_cfg: dict, meter: UsageMeter) -> BasePipelineElement:
                 kwargs["temperature"] = temperature
             response = original_create(*args, **kwargs)
             usage = getattr(response, "usage", None)
-            meter.add(getattr(usage, "prompt_tokens", None), getattr(usage, "completion_tokens", None))
+            choices = getattr(response, "choices", None) or [None]
+            # finish_reason "content_filter" means Azure blocked the model's reply.
+            # For reasoning models, completion_tokens already includes the hidden
+            # reasoning tokens; they are logged separately for the cost summary.
+            details = getattr(usage, "completion_tokens_details", None)
+            meter.add(getattr(usage, "prompt_tokens", None), getattr(usage, "completion_tokens", None),
+                      getattr(choices[0], "finish_reason", None), getattr(details, "reasoning_tokens", None))
             return response
 
         client.chat.completions.create = create
-        return OpenAILLM(client, model_cfg["model_id"], temperature=temperature)
+        return OpenAILLM(client, model_cfg["model_id"], reasoning_effort=model_cfg.get("reasoning_effort"), temperature=temperature)
 
     if provider == "anthropic":
         import anthropic
