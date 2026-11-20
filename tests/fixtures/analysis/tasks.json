@@ -1,0 +1,20 @@
+{
+  "benchmark_version": "mock-only",
+  "cases": [
+    {
+      "suite": "banking",
+      "user_task_id": "user_task_0",
+      "injection_task_id": "injection_task_0"
+    },
+    {
+      "suite": "banking",
+      "user_task_id": "user_task_1",
+      "injection_task_id": "injection_task_1"
+    },
+    {
+      "suite": "slack",
+      "user_task_id": "user_task_0",
+      "injection_task_id": "injection_task_0"
+    }
+  ]
+}
