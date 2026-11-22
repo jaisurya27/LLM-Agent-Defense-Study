@@ -1,0 +1,185 @@
+{
+  "rule": "latest attempt per case_id and defense",
+  "selected": {
+    "banking__user_task_13__clean__default": {
+      "run_id": "banking__user_task_13__clean__default__20261122T201122Z_5b84",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_13__clean__warning": {
+      "run_id": "banking__user_task_13__clean__warning__20261122T201126Z_d0e3",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_13__clean__warning_boundaries": {
+      "run_id": "banking__user_task_13__clean__warning_boundaries__20261122T201130Z_df15",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_13__injection_task_0__default": {
+      "run_id": "banking__user_task_13__injection_task_0__default__20261122T201134Z_e5e7",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_13__injection_task_0__warning": {
+      "run_id": "banking__user_task_13__injection_task_0__warning__20261122T201138Z_2db4",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_13__injection_task_0__warning_boundaries": {
+      "run_id": "banking__user_task_13__injection_task_0__warning_boundaries__20261122T201142Z_d55b",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_0__clean__default": {
+      "run_id": "banking__user_task_0__clean__default__20261122T201148Z_1c27",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_0__clean__warning": {
+      "run_id": "banking__user_task_0__clean__warning__20261122T201149Z_171a",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_0__clean__warning_boundaries": {
+      "run_id": "banking__user_task_0__clean__warning_boundaries__20261122T201150Z_1eb0",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_0__injection_task_4__default": {
+      "run_id": "banking__user_task_0__injection_task_4__default__20261122T201151Z_9464",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_0__injection_task_4__warning": {
+      "run_id": "banking__user_task_0__injection_task_4__warning__20261122T201153Z_9018",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_0__injection_task_4__warning_boundaries": {
+      "run_id": "banking__user_task_0__injection_task_4__warning_boundaries__20261122T201154Z_92d4",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_2__clean__default": {
+      "run_id": "banking__user_task_2__clean__default__20261122T201155Z_5b0e",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_2__clean__warning": {
+      "run_id": "banking__user_task_2__clean__warning__20261122T201159Z_7e73",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_2__clean__warning_boundaries": {
+      "run_id": "banking__user_task_2__clean__warning_boundaries__20261122T201201Z_3e2e",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_2__injection_task_6__default": {
+      "run_id": "banking__user_task_2__injection_task_6__default__20261122T201240Z_850b",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_2__injection_task_6__warning": {
+      "run_id": "banking__user_task_2__injection_task_6__warning__20261122T201301Z_00c9",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_2__injection_task_6__warning_boundaries": {
+      "run_id": "banking__user_task_2__injection_task_6__warning_boundaries__20261122T201314Z_465c",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_5__clean__default": {
+      "run_id": "slack__user_task_5__clean__default__20261122T201323Z_1865",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_5__clean__warning": {
+      "run_id": "slack__user_task_5__clean__warning__20261122T201328Z_6b73",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_5__clean__warning_boundaries": {
+      "run_id": "slack__user_task_5__clean__warning_boundaries__20261122T201341Z_79a2",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_5__injection_task_4__default": {
+      "run_id": "slack__user_task_5__injection_task_4__default__20261122T201350Z_d1e9",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_5__injection_task_4__warning": {
+      "run_id": "slack__user_task_5__injection_task_4__warning__20261122T201355Z_b1f0",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_5__injection_task_4__warning_boundaries": {
+      "run_id": "slack__user_task_5__injection_task_4__warning_boundaries__20261122T201400Z_c721",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_8__clean__default": {
+      "run_id": "slack__user_task_8__clean__default__20261122T201405Z_08fb",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_8__clean__warning": {
+      "run_id": "slack__user_task_8__clean__warning__20261122T201410Z_b983",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_8__clean__warning_boundaries": {
+      "run_id": "slack__user_task_8__clean__warning_boundaries__20261122T201423Z_1e25",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_8__injection_task_5__default": {
+      "run_id": "slack__user_task_8__injection_task_5__default__20261122T201430Z_ba06",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_8__injection_task_5__warning": {
+      "run_id": "slack__user_task_8__injection_task_5__warning__20261122T201438Z_fe6a",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_8__injection_task_5__warning_boundaries": {
+      "run_id": "slack__user_task_8__injection_task_5__warning_boundaries__20261122T201444Z_b6bd",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_12__clean__default": {
+      "run_id": "slack__user_task_12__clean__default__20261122T201448Z_16b6",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_12__clean__warning": {
+      "run_id": "slack__user_task_12__clean__warning__20261122T201451Z_be60",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_12__clean__warning_boundaries": {
+      "run_id": "slack__user_task_12__clean__warning_boundaries__20261122T201453Z_7243",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_12__injection_task_1__default": {
+      "run_id": "slack__user_task_12__injection_task_1__default__20261122T201456Z_28e4",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_12__injection_task_1__warning": {
+      "run_id": "slack__user_task_12__injection_task_1__warning__20261122T201505Z_bfa0",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_12__injection_task_1__warning_boundaries": {
+      "run_id": "slack__user_task_12__injection_task_1__warning_boundaries__20261122T201509Z_70fc",
+      "status": "completed",
+      "attempt": 1
+    }
+  }
+}
