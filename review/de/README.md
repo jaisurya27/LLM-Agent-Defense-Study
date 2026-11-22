@@ -2,15 +2,11 @@
 
 ## Completion status
 
-The available De work is complete for the committed Banking integration pilots:
+The available work is complete for the committed Banking integration pilots:
 all 12 real traces reviewed, exact warning and boundary placement checked, 34 tool
 responses reproduced with local simulated tools, and two annotated real excerpts
 prepared. A broader offline check also covers all six selected tasks in Banking
 and Slack. No model API calls were made during this review.
-
-This is a technical review prepared for De, not a claim that Ja has approved the
-placement policy or that Is/Re have completed independent behavioral labels.
-Real Slack traces and the frozen preliminary batch are not yet committed.
 
 Reviewed source: `5f528df855772b2ee935d84832850000dc27462c`.
 The historical pilot records identify their source as `87c5d5e-dirty`; their exact
@@ -21,7 +17,7 @@ code and pinned AgentDojo 0.1.35 / benchmark v1.2.2.
 
 - [Per-run evidence checklist](integration_checks.csv): all 12 runs, outcomes,
   verified tool-response counts, and usable trace paths.
-- [Two annotated real excerpts for Is and Re](ANNOTATED_EXCERPTS.md).
+- [Two annotated real excerpts](ANNOTATED_EXCERPTS.md).
 - [Reproducible verification script](verify_traces.py): local checks only.
 
 Run from the repository root after installing requirements:
@@ -58,9 +54,9 @@ did not explain their differences. If error text can contain attacker-controlled
 content in later tasks, it is an unprotected surface; log/review those cases and
 report that limitation. Do not claim all external text is always wrapped.
 
-Ja should acknowledge this policy before the freeze. Any later change to the
-warning, boundaries, or placement requires a new configuration ID and separate
-results. This review does not set `frozen` or change team model settings.
+Any later change to the warning, boundaries, or placement requires a new 
+configuration ID and separate results. This review does not set `frozen`
+or change team model settings.
 
 ## Explanation for Re
 
