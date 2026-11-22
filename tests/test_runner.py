@@ -143,3 +143,15 @@ def test_content_filter_block_is_recorded_and_not_retried(results_root, monkeypa
     records = [json.loads(line) for line in (results_root / "results/offline_check/smoke/episodes.jsonl").read_text().splitlines()]
     assert len(records) == 2  # one per episode, no retries
     assert all(r["termination_reason"] == "content_filter" and r["utility_success"] is None for r in records)
+
+
+def test_gpt5_comparison_config_is_separate_from_the_main_study(results_root):
+    from src.common import ROOT, tasks_path_for
+    gpt5 = load_json(ROOT / "config" / "preliminary_gpt5.json")
+    gpt5_tasks = load_json(tasks_path_for(gpt5))
+    assert select(gpt5) == gpt5_tasks
+    pick = lambda t: [(c["suite"], c["user_task_id"], c["injection_task_id"]) for c in t["cases"]]
+    assert pick(gpt5_tasks) == pick(TASKS)  # same tasks and attacks as the main study
+    runner.run_phase("smoke", gpt5, gpt5_tasks, offline="reference", dry_run=False)
+    assert (results_root / "results/offline_check/smoke_gpt5/episodes.jsonl").exists()
+    assert not (results_root / "results/offline_check/smoke").exists()

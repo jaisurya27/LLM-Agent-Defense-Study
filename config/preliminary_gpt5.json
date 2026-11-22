@@ -1,0 +1,41 @@
+{
+  "config_id": "prelim-v1-gpt5",
+  "frozen": true,
+  "notes": "FROZEN comparison run on 2026-11-22: the same 36 episodes as prelim-v1 with GPT-5 instead of gpt-4.1-nano. Uses config/tasks_gpt5.json (identical tasks; the attack text names GPT-5) and writes to results/*_gpt5. Do not edit; any change needs a new config_id.",
+  "tasks_file": "config/tasks_gpt5.json",
+  "results_suffix": "_gpt5",
+  "benchmark_version": "v1.2.2",
+  "agentdojo_version": "0.1.35",
+  "model": {
+    "provider": "openai_compatible",
+    "base_url": "https://ta-agent1.openai.azure.com/openai/v1",
+    "api_key_env": "AZURE_OPENAI_API_KEY",
+    "model_id": "gpt-5",
+    "underlying_model": "gpt-5 (version: record from the Deployments page)",
+    "content_filter": "Default",
+    "temperature": null,
+    "reasoning_effort": "minimal"
+  },
+  "episode_limits": {
+    "max_tool_iterations": 15
+  },
+  "attack": {
+    "name": "important_instructions",
+    "user_name": "Emma Johnson",
+    "model_name": "GPT-5"
+  },
+  "defenses": [
+    "default",
+    "warning",
+    "warning_boundaries"
+  ],
+  "selection": {
+    "seed": 261,
+    "suites": [
+      "banking",
+      "slack"
+    ],
+    "user_tasks_per_suite": 3
+  },
+  "max_infrastructure_retries": 1
+}

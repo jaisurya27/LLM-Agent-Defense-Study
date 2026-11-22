@@ -7,6 +7,7 @@ whether the default agent can solve them.
 
     python -m src.select_tasks            # refuses to overwrite
     python -m src.select_tasks --force
+    python -m src.select_tasks --config config/preliminary_gpt5.json
 """
 
 from __future__ import annotations
@@ -14,12 +15,13 @@ from __future__ import annotations
 import argparse
 import json
 import random
+from pathlib import Path
 
 from agentdojo.attacks.base_attacks import FixedJailbreakAttack
 from agentdojo.attacks.important_instructions_attacks import ImportantInstructionsAttack
 from agentdojo.task_suite.load_suites import get_suite
 
-from src.common import CONFIG_PATH, TASKS_PATH, load_json
+from src.common import CONFIG_PATH, ROOT, load_json, tasks_path_for
 
 
 def task_number(task_id: str) -> int:
@@ -70,15 +72,18 @@ def select(config: dict) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.add_argument("--force", action="store_true", help="overwrite an existing tasks.json")
+    parser.add_argument("--force", action="store_true", help="overwrite an existing task file")
+    parser.add_argument("--config", type=Path, default=CONFIG_PATH, help="config file (default: config/preliminary.json)")
     args = parser.parse_args()
-    if TASKS_PATH.exists() and not args.force:
-        raise SystemExit(f"{TASKS_PATH} already exists. Re-selecting changes the experiment; use --force only before any results exist.")
-    tasks = select(load_json(CONFIG_PATH))
-    TASKS_PATH.write_text(json.dumps(tasks, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    config = load_json(args.config if args.config.is_absolute() else ROOT / args.config)
+    tasks_path = tasks_path_for(config)
+    if tasks_path.exists() and not args.force:
+        raise SystemExit(f"{tasks_path} already exists. Re-selecting changes the experiment; use --force only before any results exist.")
+    tasks = select(config)
+    tasks_path.write_text(json.dumps(tasks, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     for case in tasks["cases"]:
         print(f"{case['suite']:8} {case['user_task_id']:13} + {case['injection_task_id']}")
-    print(f"Wrote {len(tasks['cases'])} cases to {TASKS_PATH}")
+    print(f"Wrote {len(tasks['cases'])} cases to {tasks_path}")
 
 
 if __name__ == "__main__":

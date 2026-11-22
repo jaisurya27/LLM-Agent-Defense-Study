@@ -29,10 +29,15 @@ def load_env_file(path: Path = ROOT / ".env") -> None:
                 os.environ.setdefault(key.strip(), value.strip().strip("'\""))
 
 
-def config_hash() -> str:
+def tasks_path_for(config: dict) -> Path:
+    """The task file a config uses. Defaults to config/tasks.json."""
+    return ROOT / config.get("tasks_file", "config/tasks.json")
+
+
+def config_hash(config_path: Path = CONFIG_PATH, tasks_path: Path = TASKS_PATH) -> str:
     """Fingerprint of everything that defines the experiment."""
     digest = hashlib.sha256()
-    for path in (CONFIG_PATH, TASKS_PATH, ROOT / "prompts" / "warning.txt", ROOT / "src" / "defenses.py", ROOT / "src" / "pipeline.py"):
+    for path in (config_path, tasks_path, ROOT / "prompts" / "warning.txt", ROOT / "src" / "defenses.py", ROOT / "src" / "pipeline.py"):
         digest.update(path.name.encode())
         digest.update(path.read_bytes())
     return digest.hexdigest()[:12]

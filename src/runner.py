@@ -4,6 +4,10 @@
     python -m src.runner integration   # the same 2 cases under all 3 defenses
     python -m src.runner batch         # all planned episodes (needs frozen config)
 
+Add --config config/preliminary_gpt5.json to run the GPT-5 comparison. It has
+its own task file and writes to folders ending in _gpt5, so the main results
+are never touched.
+
 Add --dry-run to list the planned episodes without running anything, and
 --offline to use a scripted stand-in instead of the API (no key, no cost).
 
@@ -25,7 +29,7 @@ from pathlib import Path
 
 from agentdojo.task_suite.load_suites import get_suite
 
-from src.common import CONFIG_PATH, ROOT, TASKS_PATH, code_revision, config_hash, load_env_file, load_json
+from src.common import CONFIG_PATH, ROOT, TASKS_PATH, code_revision, config_hash, load_env_file, load_json, tasks_path_for
 from src.defenses import DEFENSES
 from src.pipeline import CaptureLogger, ScriptedLLM, UsageMeter, build_llm, build_pipeline, build_system_message
 from src.schema import validate_record
@@ -214,9 +218,11 @@ def write_selection(out_dir: Path, records: list[dict]) -> None:
     (out_dir / "selected_runs.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
-def run_phase(phase: str, config: dict, tasks: dict, offline: str | None, dry_run: bool) -> None:
+def run_phase(phase: str, config: dict, tasks: dict, offline: str | None, dry_run: bool,
+              config_path: Path = CONFIG_PATH, tasks_path: Path = TASKS_PATH) -> None:
     episodes = plan_episodes(phase, config, tasks)
-    out_dir = ROOT / "results" / ("offline_check/" if offline else "") / PHASE_DIRS[phase]
+    folder = PHASE_DIRS[phase] + config.get("results_suffix", "")
+    out_dir = ROOT / "results" / ("offline_check/" if offline else "") / folder
     max_retries = config["max_infrastructure_retries"]
 
     if dry_run:
@@ -230,7 +236,7 @@ def run_phase(phase: str, config: dict, tasks: dict, offline: str | None, dry_ru
     if phase == "batch" and not offline and not config.get("frozen"):
         raise SystemExit("config/preliminary.json is not frozen. Agree the settings with the team, set \"frozen\": true, commit, then launch the batch.")
 
-    fingerprint = {"config_hash": config_hash(), "code_revision": code_revision()}
+    fingerprint = {"config_hash": config_hash(config_path, tasks_path), "code_revision": code_revision()}
     episodes_path = out_dir / "episodes.jsonl"
     out_dir.mkdir(parents=True, exist_ok=True)
     records = read_records(episodes_path)
@@ -273,9 +279,16 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true", help="list planned episodes and exit")
     parser.add_argument("--offline", nargs="?", const="reference", choices=["reference", "compromised"],
                         help="scripted stand-in instead of the API; 'compromised' also carries out the attack")
+    parser.add_argument("--config", type=Path, default=CONFIG_PATH, help="config file (default: config/preliminary.json)")
     args = parser.parse_args()
     load_env_file()
-    run_phase(args.phase, load_json(CONFIG_PATH), load_json(TASKS_PATH), args.offline, args.dry_run)
+    config_path = args.config if args.config.is_absolute() else ROOT / args.config
+    config = load_json(config_path)
+    tasks_path = tasks_path_for(config)
+    tasks = load_json(tasks_path)
+    if tasks["attack"] != config["attack"] or tasks["selection"] != config["selection"]:
+        raise SystemExit(f"{tasks_path.name} was not generated from {config_path.name}. Run: python -m src.select_tasks --config {args.config} --force")
+    run_phase(args.phase, config, tasks, args.offline, args.dry_run, config_path, tasks_path)
 
 
 if __name__ == "__main__":
