@@ -67,6 +67,20 @@ Record conventions:
 - `utility_success` and `attack_success` are booleans from AgentDojo's own evaluators, or null when unavailable. `attack_success` is null for clean runs.
 - `case_id` is the same across defenses for the same task and clean/attack pairing. `run_id` is unique per attempt.
 
+## Analyze saved results (Ab)
+
+The analysis needs no API key or additional packages:
+
+```bash
+python -m analysis.summarize --results-dir results/integration_gpt41nano --phase integration --output analysis/reports/integration_gpt41nano
+```
+
+See [analysis/README.md](analysis/README.md) for metric definitions, paired
+comparisons, missing/error handling, review labels and the final batch command.
+[Ab's handoff](analysis/HANDOFF.md) links the two real integration pilot reports
+and records the remaining dependencies on the batch and resolved review labels.
+Pilot reports are separate from the preliminary study results.
+
 ## Layout
 
 ```
@@ -79,6 +93,7 @@ src/select_tasks.py       seeded task selection
 src/runner.py             smoke / integration / batch
 src/schema.py             episode record format (shared with Ab)
 tests/                    offline checks
+analysis/                 reproducible tables, pilot reports and Ab's handoff
 ```
 
 ## How the defenses are applied

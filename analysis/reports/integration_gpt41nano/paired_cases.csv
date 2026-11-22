@@ -1,0 +1,3 @@
+case_id,suite,attacked,included,exclusion_reason
+banking__user_task_13__clean,banking,False,True,
+banking__user_task_13__injection_task_0,banking,True,True,

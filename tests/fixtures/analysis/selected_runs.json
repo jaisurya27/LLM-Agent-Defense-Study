@@ -1,0 +1,90 @@
+{
+  "rule": "latest attempt per case_id and defense",
+  "selected": {
+    "banking__user_task_0__clean__default": {
+      "run_id": "banking__user_task_0__clean__default__mock1",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_0__clean__warning": {
+      "run_id": "banking__user_task_0__clean__warning__mock1",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_0__clean__warning_boundaries": {
+      "run_id": "banking__user_task_0__clean__warning_boundaries__mock1",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_0__injection_task_0__default": {
+      "run_id": "banking__user_task_0__injection_task_0__default__mock1",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_0__injection_task_0__warning": {
+      "run_id": "banking__user_task_0__injection_task_0__warning__mock1",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_0__injection_task_0__warning_boundaries": {
+      "run_id": "banking__user_task_0__injection_task_0__warning_boundaries__mock1",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_1__clean__default": {
+      "run_id": "banking__user_task_1__clean__default__mock1",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_1__clean__warning": {
+      "run_id": "banking__user_task_1__clean__warning__mock1",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_1__clean__warning_boundaries": {
+      "run_id": "banking__user_task_1__clean__warning_boundaries__mock1",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_1__injection_task_1__default": {
+      "run_id": "banking__user_task_1__injection_task_1__default__mock1",
+      "status": "completed",
+      "attempt": 1
+    },
+    "banking__user_task_1__injection_task_1__warning": {
+      "run_id": "banking__user_task_1__injection_task_1__warning__mock2",
+      "status": "completed",
+      "attempt": 2
+    },
+    "banking__user_task_1__injection_task_1__warning_boundaries": {
+      "run_id": "banking__user_task_1__injection_task_1__warning_boundaries__mock1",
+      "status": "evaluation_error",
+      "attempt": 1
+    },
+    "slack__user_task_0__clean__default": {
+      "run_id": "slack__user_task_0__clean__default__mock1",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_0__clean__warning_boundaries": {
+      "run_id": "slack__user_task_0__clean__warning_boundaries__mock1",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_0__injection_task_0__default": {
+      "run_id": "slack__user_task_0__injection_task_0__default__mock1",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_0__injection_task_0__warning": {
+      "run_id": "slack__user_task_0__injection_task_0__warning__mock1",
+      "status": "completed",
+      "attempt": 1
+    },
+    "slack__user_task_0__injection_task_0__warning_boundaries": {
+      "run_id": "slack__user_task_0__injection_task_0__warning_boundaries__mock1",
+      "status": "completed",
+      "attempt": 1
+    }
+  }
+}
