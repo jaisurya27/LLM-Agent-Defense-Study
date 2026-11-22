@@ -1,7 +1,7 @@
 """Audit committed pilot traces using local simulated tools; no model/API calls.
 
 Run from the repository root:
-    python -m review.de.verify_traces
+    python -m review.devin.verify_traces
 """
 import csv
 import json
@@ -83,7 +83,7 @@ def audit():
                 'utility_success': record['utility_success'], 'attack_success': record['attack_success'],
                 'trace_path': str(path.relative_to(ROOT)),
             })
-    output = ROOT / 'review/de/integration_checks.csv'
+    output = ROOT / 'review/devin/integration_checks.csv'
     with output.open('w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=list(rows[0]))
         writer.writeheader(); writer.writerows(rows)

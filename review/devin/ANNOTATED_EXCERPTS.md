@@ -1,4 +1,4 @@
-# De annotated integration excerpts
+# Annotated integration excerpts
 
 These excerpts are copied from committed real API-run traces at revision
 `5f528df855772b2ee935d84832850000dc27462c`. Message indices are zero-based

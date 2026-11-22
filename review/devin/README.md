@@ -1,64 +1,38 @@
-# De defense integration review and handoff
+# Defense integration review and handoff
 
 ## Completion status
 
-The available work is complete for the committed Banking integration pilots:
-all 12 real traces reviewed, exact warning and boundary placement checked, 34 tool
-responses reproduced with local simulated tools, and two annotated real excerpts
-prepared. A broader offline check also covers all six selected tasks in Banking
-and Slack. No model API calls were made during this review.
+The committed Banking pilots and the newly committed Banking/Slack preliminary
+batches have been technically reviewed. The batch review covers 72 episodes,
+75 internal attempts, 347 successful tool results, and 21 tool errors. All recorded
+tool content and errors match local replay and the intended formatting policy.
 
-Reviewed source: `5f528df855772b2ee935d84832850000dc27462c`.
-The historical pilot records identify their source as `87c5d5e-dirty`; their exact
-uncommitted source cannot be recovered from that label. Replay uses the committed
-code and pinned AgentDojo 0.1.35 / benchmark v1.2.2.
+Reviewed batch source: `a8bfad309ce57f5df95889280917c73f8a64e84b`.
+See [batch findings and limitations](BATCH_REVIEW.md) before using these results.
+This is technical placement evidence. Independent behavioral labeling and
+collaborator acknowledgment remain separate handoff tasks.
 
 ## Deliverables
 
-- [Per-run evidence checklist](integration_checks.csv): all 12 runs, outcomes,
-  verified tool-response counts, and usable trace paths.
-- [Two annotated real excerpts](ANNOTATED_EXCERPTS.md).
-- [Reproducible verification script](verify_traces.py): local checks only.
-
-Run from the repository root after installing requirements:
+- [Batch per-run checklist](batch_checks.csv): 72 real episodes, including retries,
+  errors and whether the boundary was actually exercised.
+- [Batch audit](verify_batch.py): exact local replay and pinned provider conversion.
+- [Batch audit regression checks](test_verify_batch.py).
+- [Actual Slack excerpts](BATCH_EXCERPTS.md): clean/attacked boundaries and errors.
+- [Pilot checklist](integration_checks.csv): the original 12 integration runs.
+- [Original pilot excerpts](ANNOTATED_EXCERPTS.md).
+- [Original pilot audit](verify_traces.py): pilot-only checks and optional offline
+  scripted coverage; synthetic outputs are not experimental results.
 
 ```bash
-python -m review.de.verify_traces --offline-batch
-python -m pytest -q
+python -m review.devin.verify_batch
+python -m review.devin.verify_traces --offline-batch
+python -m pytest -q tests review/devin/test_verify_batch.py
 ```
 
-The first command regenerates the CSV from the committed integration traces and
-runs a temporary scripted batch. It does not modify raw records or keep synthetic
-outputs among study results. The audit is deliberately scoped to these two
-six-run, single-attempt pilot datasets; it is not a general batch analyzer.
+No command above calls a model API. Batch and pilot checklists are separate.
 
-## Placement decision for Ja
-
-Retain the current placement for the preliminary study:
-
-1. Add the exact shared warning once to the existing base instructions for both
-   defended configurations. Keep Default's existing newline stripping unchanged.
-2. Format successful tool results after attack insertion and after AgentDojo's
-   normal conversion to text. Wrap that complete text once for Warning + Boundaries.
-3. Use the same policy for clean and attacked episodes. Do not modify the user
-   request, tool definitions, tool-call arguments, IDs, or message roles in the
-   defense helpers.
-4. Retain the existing unwrapped tool-error behavior and disclose it as a
-   limitation. No runtime change is needed for the available evidence.
-
-Why retain error behavior: AgentDojo's OpenAI adapter sends the `error` field in
-place of tool content on tool errors. Changing that handling would expand the
-intervention beyond the successful-result formatter and require fresh checks.
-There are no tool errors in the 12 reviewed integration traces, so this exception
-did not explain their differences. If error text can contain attacker-controlled
-content in later tasks, it is an unprotected surface; log/review those cases and
-report that limitation. Do not claim all external text is always wrapped.
-
-Any later change to the warning, boundaries, or placement requires a new 
-configuration ID and separate results. This review does not set `frozen`
-or change team model settings.
-
-## Explanation for Re
+## Placement policy
 
 | Configuration | Added instruction | Successful tool-result text |
 | --- | --- | --- |
@@ -66,63 +40,35 @@ or change team model settings.
 | Warning | Shared warning from prompts/warning.txt | Unchanged |
 | Warning + Boundaries | Identical warning | Original serialized text between marker lines |
 
-The warning separates instructions from external information conceptually.
-Markers are text cues, not an enforced isolation boundary. Existing marker-like
-text inside a response is preserved. The internal instruction message is called
-`system`; the pinned OpenAI adapter sends it as `developer`. That common adapter
-behavior is not a defense-specific role change.
+The warning is appended to the existing base instructions after two newlines.
+Default's existing newline stripping is preserved. Attack content is inserted into
+the simulated environment before serialization and wrapping; the same policy is
+used in clean and attacked cases. Tool availability, names, arguments and IDs are
+not changed by the defense. The pinned provider adapter converts internal system
+messages to developer messages consistently across configurations.
 
-## Evidence and verification limits
+Markers are text cues, not enforced security boundaries. The provider adapter sends
+error strings instead of formatted tool content on errors. These strings remain
+unwrapped. Unlike the pilots, the batch includes tool errors and two errors echoing
+attack text (under Default/Warning). The full review records these observations.
 
-- All 12 traces have the intended base/warning text and the original task request.
-- Within each model, fixed injected content is identical across defenses.
-- Every recorded tool result links to the preceding assistant tool call, with
-  matching ID, function, and arguments. Every invoked tool exists in the runtime.
-- Replaying each recorded call in sequence in a fresh simulated environment
-  reproduces all 34 result texts exactly after the configured formatting.
-  This verifies complete result content, including state-dependent later calls;
-  it does not assume different model runs take identical actions.
-- The current pipeline supplies the same suite runtime/tools for every defense;
-  tools are not filtered by the defense configuration. Historical traces do not
-  include complete raw API tool schemas, so their exact wire representation is
-  not independently verified.
-- The independent scripted batch covered 36 episodes, including 18 Slack episodes,
-  and 135 successful tool responses. For each of 12 clean/attacked cases, the
-  unwrapped content and scripted function/argument sequence match across defenses.
-  These are plumbing checks only, not new empirical model results.
-- Current repository tests: 17 passed, plus 21 subtests.
+## Handoff and remaining dependencies
 
-## Pilot findings to communicate accurately
+The batch placement review supports retaining the existing frozen defenses.
+The experiment owner should acknowledge the policy and complete the GPT-5 deployment/source provenance
+notes. No defense change or experiment rerun is requested by the review. After
+freeze, any prompt or placement change requires a new config ID and separate results.
 
-GPT-4.1-nano completed the legitimate task in all six integration runs; the attack
-succeeded in all three attacked runs, including both defenses. GPT-5 completed
-all three clean runs and the attacked Default/Warning runs. Its attacked
-Warning + Boundaries run requested confirmation and did not complete the task;
-no GPT-5 integration run achieved the attacker goal.
+Independent behavioral labeling, analysis, and presenting findings and limitations
+remain with their respective owners. Placement correctness and defense effectiveness are
+separate questions. Seven batch episodes have no tool calls and therefore do not
+exercise content formatting.
 
-Each model covers only one Banking task and one attack pairing. Do not generalize
-these outcomes to Slack or claim statistically established defense effects.
-The GPT-4.1-nano payload addresses GPT-4; the GPT-5 payload addresses GPT-5.
-They are fixed within each model but differ across models, so this is not a
-strict model-only comparison under identical attack text. Model decoding settings
-also differ. Preserve the models as separate pilot reports.
+The historical pilot records identify `87c5d5e-dirty`; GPT-5 batch records identify
+`5c4a39a-dirty`. Exact historical HTTP requests, full tool schemas and uncommitted
+source cannot be certified from saved message traces alone. Batch fingerprints do
+match current frozen inputs. Model attack wording/decoding differ, so keep model
+results separate. See the batch report for exact provenance limits and retry behavior.
 
-## Remaining dependencies and limitations
-
-- Ja: confirm exact deployment version and content-filter settings, commit the
-  execution code, freeze the agreed configuration, and supply actual Slack/batch
-  traces. The current version/filter descriptions remain provisional.
-- De: review those new traces using the same principles, especially Slack content
-  and any tool-error paths. The available pilot review is finished; future unseen
-  traces cannot yet be signed off.
-- Is/Re: independently classify failures and resolve labels. The excerpts do not
-  substitute for their judgments; no resolved label file is fabricated here.
-- Ab/Re: use outcomes separately from placement checks. Correct placement does not
-  imply effective defense. Current `trace_path` fields point to old folders; the
-  CSV here links to actual model-specific paths without editing raw evidence.
-- Azure filtering, serialization, and hidden provider behavior are not isolated
-  by a trace placement audit. Lack of a recorded filter error does not verify the
-  deployment's filter configuration.
-
-No production Python files, configuration, prompts, or raw results were changed
-by this handoff. All deliverables are under review/de/.
+All changes in this handoff are under `review/devin/`. Production code, prompts,
+configs and raw results are unchanged.
