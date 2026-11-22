@@ -72,14 +72,16 @@ Record conventions:
 The analysis needs no API key or additional packages:
 
 ```bash
-python -m analysis.summarize --results-dir results/integration_gpt41nano --phase integration --output analysis/reports/integration_gpt41nano
+python -m analysis.summarize --results-dir results/preliminary --phase batch --tasks config/tasks.json --output analysis/reports/preliminary
+python -m analysis.summarize --results-dir results/preliminary_gpt5 --phase batch --tasks config/tasks_gpt5.json --output analysis/reports/preliminary_gpt5
 ```
 
 See [analysis/README.md](analysis/README.md) for metric definitions, paired
 comparisons, missing/error handling, review labels and the final batch command.
-[Ab's handoff](analysis/HANDOFF.md) links the two real integration pilot reports
-and records the remaining dependencies on the batch and resolved review labels.
-Pilot reports are separate from the preliminary study results.
+[Ab's handoff](analysis/HANDOFF.md) links the reports for both real 36-episode
+batches and summarizes the findings. Numerical analysis is complete; Is/Re's
+resolved review labels are still needed for refusal/tool-format counts. Pilot
+reports remain separate from the preliminary study results.
 
 ## Layout
 

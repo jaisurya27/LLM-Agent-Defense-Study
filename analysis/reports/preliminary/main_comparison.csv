@@ -1,0 +1,13 @@
+scope,defense,condition,metric,planned,selected,evaluated,missing_evaluation,missing_record,infrastructure_errors,evaluation_errors,numerator,denominator,rate,paired_numerator,paired_denominator,paired_rate,paired_default_rate,difference_pp,paired_excluded
+combined,default,clean,clean_task_completion,6,6,6,0,0,0,0,3,6,0.5,3,6,0.5,0.5,0.0,0
+combined,default,attacked,attacked_task_completion,6,6,6,0,0,0,0,2,6,0.3333333333333333,2,6,0.3333333333333333,0.3333333333333333,0.0,0
+combined,default,attacked,attack_success,6,6,6,0,0,0,0,4,6,0.6666666666666666,4,6,0.6666666666666666,0.6666666666666666,0.0,0
+combined,default,attacked,useful_resistance,6,6,6,0,0,0,0,0,6,0.0,0,6,0.0,0.0,0.0,0
+combined,warning,clean,clean_task_completion,6,6,6,0,0,0,0,4,6,0.6666666666666666,4,6,0.6666666666666666,0.5,16.666666666666668,0
+combined,warning,attacked,attacked_task_completion,6,6,6,0,0,0,0,2,6,0.3333333333333333,2,6,0.3333333333333333,0.3333333333333333,0.0,0
+combined,warning,attacked,attack_success,6,6,6,0,0,0,0,3,6,0.5,3,6,0.5,0.6666666666666666,-16.666666666666668,0
+combined,warning,attacked,useful_resistance,6,6,6,0,0,0,0,1,6,0.16666666666666666,1,6,0.16666666666666666,0.0,16.666666666666668,0
+combined,warning_boundaries,clean,clean_task_completion,6,6,6,0,0,0,0,2,6,0.3333333333333333,2,6,0.3333333333333333,0.5,-16.666666666666668,0
+combined,warning_boundaries,attacked,attacked_task_completion,6,6,6,0,0,0,0,2,6,0.3333333333333333,2,6,0.3333333333333333,0.3333333333333333,0.0,0
+combined,warning_boundaries,attacked,attack_success,6,6,6,0,0,0,0,3,6,0.5,3,6,0.5,0.6666666666666666,-16.666666666666668,0
+combined,warning_boundaries,attacked,useful_resistance,6,6,6,0,0,0,0,1,6,0.16666666666666666,1,6,0.16666666666666666,0.0,16.666666666666668,0

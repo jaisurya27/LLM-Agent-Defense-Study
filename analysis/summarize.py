@@ -170,7 +170,7 @@ def read_labels(path, records):
     return labels
 
 
-def resolve_trace(record, results_dir, root):
+def resolve_trace(record, results_dir, root, task=None):
     """Recognize archived pilot folders without rewriting the original records."""
     recorded = Path(record["trace_path"])
     primary = recorded if recorded.is_absolute() else root / recorded
@@ -183,9 +183,18 @@ def resolve_trace(record, results_dir, root):
             trace = read_json(candidate)
             if not isinstance(trace, dict) or trace.get("record") != record:
                 raise AnalysisError(f"Trace record differs from episodes.jsonl: {candidate}")
+            if task is not None:
+                for field in ("user_prompt", "attacker_goal", "injections"):
+                    if field not in task:
+                        continue  # Minimal synthetic manifests contain only task IDs.
+                    expected = task[field]
+                    if not record["attacked"] and field != "user_prompt":
+                        expected = {} if field == "injections" else None
+                    if trace.get(field) != expected:
+                        raise AnalysisError(f"Task manifest {field} differs from saved trace for {record['run_id']}; select the exact --tasks file used by this experiment")
             display = candidate.relative_to(root.resolve()).as_posix() if candidate.is_relative_to(root.resolve()) else candidate.as_posix()
-            return display, relocated, trace.get("model_settings")
-    return None, False, None
+            return display, relocated, trace.get("model_settings"), trace.get("episode_limits")
+    return None, False, None, None
 
 
 def ratio(numerator, denominator):
@@ -293,12 +302,16 @@ def summarize(results_dir, phase, tasks_path, labels_path=None, root=ROOT, allow
         warnings.append("SYNTHETIC CHECK ONLY: these records do not measure model behavior.")
     if labels_path is None:
         warnings.append("Resolved review labels have not been supplied. Unreviewed is not no; refusal/tool-format rates remain unavailable.")
-    selected_cases, model_settings = [], []
+    selected_cases, model_settings, episode_limits = [], [], []
     for key, expected in planned.items():
         record = selected.get(key)
-        trace, relocated, settings = resolve_trace(record, results_dir, root) if record else (None, False, None)
+        task = next(c for c in tasks["cases"] if c["suite"] == expected["suite"] and c["user_task_id"] == expected["user_task_id"]
+                    and (not expected["attacked"] or c["injection_task_id"] == expected["injection_task_id"]))
+        trace, relocated, settings, limits = resolve_trace(record, results_dir, root, task) if record else (None, False, None, None)
         if settings is not None and settings not in model_settings:
             model_settings.append(settings)
+        if limits is not None and limits not in episode_limits:
+            episode_limits.append(limits)
         row = dict(**expected, run_id=record["run_id"] if record else None,
                    status=record["status"] if record else "missing_record",
                    utility_success=record["utility_success"] if record else None,
@@ -313,6 +326,13 @@ def summarize(results_dir, phase, tasks_path, labels_path=None, root=ROOT, allow
         selected_cases.append(row)
     if len(model_settings) > 1:
         raise AnalysisError("Selected traces contain different model settings; split the experiment before analysis")
+    if len(episode_limits) > 1:
+        raise AnalysisError("Selected traces contain different episode limits; split the experiment before analysis")
+    for settings in model_settings:
+        for field in ("underlying_model", "content_filter"):
+            value = str(settings.get(field) or "")
+            if not value or any(marker in value.lower() for marker in ("record from", "to confirm", "set-")):
+                warnings.append(f"Saved {field} is unconfirmed ({value or 'not recorded'}); obtain the exact run setting from Ja.")
     relocated_count = sum(r["trace_relocated"] for r in selected_cases)
     missing_traces = sum(r["run_id"] is not None and r["resolved_trace_path"] is None for r in selected_cases)
     if relocated_count:
@@ -338,6 +358,8 @@ def summarize(results_dir, phase, tasks_path, labels_path=None, root=ROOT, allow
     metadata = dict(phase=phase, synthetic=synthetic, config_id=records[0]["config_id"],
                     config_hash=records[0].get("config_hash"), model_id=records[0].get("model_id"),
                     model_provider=records[0].get("model_provider"), model_settings=model_settings,
+                    episode_limits=episode_limits,
+                    task_manifest={k: tasks.get(k) for k in ("benchmark_version", "selection", "attack")},
                     run_code_revisions=revisions, planned_episodes=len(planned), selected_episodes=len(selected),
                     evaluated_episodes=len(planned) - missing_evaluations, all_attempts=len(records),
                     resolved_labels_supplied=labels_path is not None, ignored_label_run_ids=ignored_labels,
@@ -380,7 +402,18 @@ def render_report(summary):
     lines = [f"# {stage}: {m['model_id'] or 'unknown model'} / {m['phase']}", "",
              f"Evaluated **{m['evaluated_episodes']}/{m['planned_episodes']}** planned episodes; "
              f"{m['selected_episodes']} retained attempts from {m['all_attempts']} total attempts. "
-             f"Configuration: `{m['config_id']}`; hash: `{m['config_hash']}`.", "",
+             f"Configuration: `{m['config_id']}`; hash: `{m['config_hash']}`.", ""]
+    settings = m["model_settings"][0] if m["model_settings"] else {}
+    task_manifest = m["task_manifest"]
+    lines += ["## Recorded experiment settings", "", markdown_table(["Setting", "Saved value"], [
+        ["Model/version", settings.get("underlying_model")], ["Temperature", settings.get("temperature")],
+        ["Reasoning effort", settings.get("reasoning_effort")], ["Provider content filter", settings.get("content_filter")],
+        ["Episode limits", json.dumps(m["episode_limits"])],
+        ["Benchmark", task_manifest.get("benchmark_version")],
+        ["Fixed attack specification", json.dumps(task_manifest.get("attack"))],
+        ["Run source revisions", ", ".join(m["run_code_revisions"])]
+    ]), "", "Null temperature/reasoning settings indicate no explicit value in the recorded configuration. "
+        "Fixed payloads are checked against available saved traces; distinct model reports must not be pooled.", "",
              "## Limitations and input checks", "",
              *[f"- {warning}" for warning in summary["warnings"]],
              "- Descriptive counts only. Small samples do not establish preserved utility. Zero baseline attack successes limit assessment of defense benefits.",
@@ -399,7 +432,8 @@ def render_report(summary):
     lines += ["## Token and runtime summary", "", markdown_table(
         ["Suite", "Defense", "Condition", "Median tokens", "Token n", "Median seconds", "Runtime n", "All-attempt tokens"],
         [[r["scope"], r["defense"], r["condition"], r["median_total_tokens"], f"{r['tokens_available']}/{r['evaluated']}",
-          r["median_runtime_seconds"], f"{r['runtimes_available']}/{r['evaluated']}", r["all_attempts_total_tokens"]] for r in summary["costs"]]), "",
+              f"{r['median_runtime_seconds']:.4f}" if r["median_runtime_seconds"] is not None else None,
+              f"{r['runtimes_available']}/{r['evaluated']}", r["all_attempts_total_tokens"]] for r in summary["costs"]]), "",
         "## Error summary", "", markdown_table(
             ["Suite", "Defense", "Condition", "Missing records", "Retained infrastructure errors", "Retained evaluation errors", "Infrastructure error attempts", "Content-filter attempts"],
             [[r["scope"], r["defense"], r["condition"], r["missing_record"], r["infrastructure_errors"], r["evaluation_errors"],

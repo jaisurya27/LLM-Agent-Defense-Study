@@ -1,96 +1,131 @@
-# Ab handoff: analysis tooling and pilot validation
+# Ab handoff: preliminary batch analysis
 
-**Completed:** the analysis implementation, synthetic calculation checks,
-real pilot validation, reproducible pilot tables, selected-case lists,
-review queues, and instructions for the final batch.
+Updated 2026-11-22 from team `main` at `c8b970f`. All fetched team branch
+commits were already merged into that revision, including Ab's analysis and
+De's integration review. Ja has supplied both frozen 36-episode batches.
 
-**Pending external inputs:** Ja's frozen 36-episode batch and Is/Re's
-resolved review labels. The final preliminary study tables cannot be
-completed before those inputs exist. No pilot record is presented as a
-batch result, and no review judgment has been invented.
+**Completed:** numerical analysis of both real batches, main comparison and
+suite tables, token/runtime summaries, error summaries, selected-case and
+paired-case lists, and failed-task review queues. Models and pilots remain
+separate. No raw result, prompt, configuration or benchmark evaluator was changed.
+
+**Pending external input:** Is/Re's resolved refusal and tool-format labels.
+No such file is committed on the fetched branches. The batches contain
+**21 failed-task episodes for GPT-4.1-nano and 11 for GPT-5**. These are
+review-queue counts, not refusal counts. The final behavioral-review
+aggregation remains pending; current report cells explicitly say unreviewed.
 
 ## Artifacts for Re
 
-- [GPT-4.1-nano integration report](reports/integration_gpt41nano/report.md)
-- [GPT-5 integration report](reports/integration_gpt5/report.md)
-- Each report folder contains the main comparison, suite breakdown,
-  token/runtime and error/review summaries, selected cases, paired cases,
-  full attempt audit, and a review queue in CSV form.
-- [Metric definitions, output headings and reproduction commands](README.md)
-- [Analysis implementation](summarize.py)
-- [Calculation checks](../tests/test_analysis.py) and
-  [explicitly synthetic fixtures](../tests/fixtures/analysis/README.md)
+| Deliverable | GPT-4.1-nano (`prelim-v1`) | GPT-5 (`prelim-v1-gpt5`) |
+|---|---|---|
+| Readable report | [Report](reports/preliminary/report.md) | [Report](reports/preliminary_gpt5/report.md) |
+| Main comparison | [CSV](reports/preliminary/main_comparison.csv) | [CSV](reports/preliminary_gpt5/main_comparison.csv) |
+| Banking/Slack breakdown | [CSV](reports/preliminary/suite_breakdown.csv) | [CSV](reports/preliminary_gpt5/suite_breakdown.csv) |
+| Token/runtime summary | [CSV](reports/preliminary/cost_summary.csv) | [CSV](reports/preliminary_gpt5/cost_summary.csv) |
+| Error summary | [CSV](reports/preliminary/error_summary.csv) | [CSV](reports/preliminary_gpt5/error_summary.csv) |
+| Review summary (labels pending) | [CSV](reports/preliminary/review_summary.csv) | [CSV](reports/preliminary_gpt5/review_summary.csv) |
+| Selected cases and trace paths | [CSV](reports/preliminary/selected_cases.csv) | [CSV](reports/preliminary_gpt5/selected_cases.csv) |
+| Paired inclusion/exclusion list | [CSV](reports/preliminary/paired_cases.csv) | [CSV](reports/preliminary_gpt5/paired_cases.csv) |
+| Failed-task review queue | [21 episodes](reports/preliminary/review_queue.csv) | [11 episodes](reports/preliminary_gpt5/review_queue.csv) |
 
-## What the pilot tables actually show
+Each report folder also contains `attempts.csv` and a `summary.json` with input
+hashes, recorded model settings, episode limits and the exact task-manifest
+attack specification. [Reproduction commands and definitions](README.md).
 
-Each model's integration dataset contains six evaluated episodes for one
-Banking user task: one clean and one attacked episode per defense. There
-are no Slack pilot observations and no independent repeated trials.
+## Main numerical results
+
+Each denominator below is six: three Banking and three Slack tasks for the
+specified clean/attacked condition. Each defense has twelve evaluated episodes
+per model. Useful resistance requires task success and attack failure together.
 
 | Model | Defense | Clean completion | Attacked completion | Attack success | Useful resistance |
 |---|---|---|---|---|---|
-| GPT-4.1-nano | Default | 1/1 | 1/1 | 1/1 | 0/1 |
-| GPT-4.1-nano | Warning | 1/1 | 1/1 | 1/1 | 0/1 |
-| GPT-4.1-nano | Warning + Boundaries | 1/1 | 1/1 | 1/1 | 0/1 |
-| GPT-5 | Default | 1/1 | 1/1 | 0/1 | 1/1 |
-| GPT-5 | Warning | 1/1 | 1/1 | 0/1 | 1/1 |
-| GPT-5 | Warning + Boundaries | 1/1 | 0/1 | 0/1 | 0/1 |
+| GPT-4.1-nano | Default | 3/6 (50.0%) | 2/6 (33.3%) | 4/6 (66.7%) | 0/6 (0.0%) |
+| GPT-4.1-nano | Warning | 4/6 (66.7%) | 2/6 (33.3%) | 3/6 (50.0%) | 1/6 (16.7%) |
+| GPT-4.1-nano | Warning + Boundaries | 2/6 (33.3%) | 2/6 (33.3%) | 3/6 (50.0%) | 1/6 (16.7%) |
+| GPT-5 | Default | 6/6 (100.0%) | 2/6 (33.3%) | 0/6 (0.0%) | 2/6 (33.3%) |
+| GPT-5 | Warning | 6/6 (100.0%) | 3/6 (50.0%) | 0/6 (0.0%) | 3/6 (50.0%) |
+| GPT-5 | Warning + Boundaries | 5/6 (83.3%) | 3/6 (50.0%) | 0/6 (0.0%) | 3/6 (50.0%) |
 
-These observations validate the analysis paths; they do not establish a
-general defense benefit, model ranking, or preserved utility. In particular,
-GPT-5 has no baseline attack success on this one integration case. Its
-Warning + Boundaries task failure still needs human review; it is not
-automatically an unnecessary refusal or a tool-format failure.
+Paired differences from Default (percentage points, defense minus Default):
 
-## Handoff to Ja
+| Model | Defense | Clean completion | Attacked completion | Attack success | Useful resistance |
+|---|---|---|---|---|---|
+| GPT-4.1-nano | Warning | +16.7 | 0.0 | -16.7 | +16.7 |
+| GPT-4.1-nano | Warning + Boundaries | -16.7 | 0.0 | -16.7 | +16.7 |
+| GPT-5 | Warning | 0.0 | +16.7 | 0.0 | +16.7 |
+| GPT-5 | Warning + Boundaries | -16.7 | +16.7 | 0.0 | +16.7 |
 
-The real JSONL schema and selected-attempt files can be consumed by the
-analysis. The original records and traces have not been modified.
+All six clean and all six attacked cases are evaluated under all defenses in
+each model, so paired denominators are six and there are **no paired exclusions**.
+Suite denominators are three. For GPT-4.1-nano, Banking has identical outcomes
+across defenses; the observed differences occur in Slack. For GPT-5, the
+defense differences occur in Banking, while Slack outcomes match across defenses.
 
-Before the batch, record the exact deployment/model version, content-filter
-settings, decoding settings, limits and budget in the agreed frozen
-experiment. Save the task manifest, selection file and traces alongside the
-36 planned cases. Missing/error outcomes must remain explicit. Use a clean,
-identifiable source revision; pilot records currently say `87c5d5e-dirty`.
+These are descriptive observations from a small batch. The zero GPT-5 baseline
+attack-success count limits assessment of a security benefit from the defenses.
+Warning + Boundaries has one fewer clean completion than Default in each model;
+the review labels are needed to explain why. No preserved-utility or statistical
+significance claim is made.
 
-Archived pilot `trace_path` values are stale. The analysis resolves their
-actual sibling trace locations and discloses the relocation. Future outputs
-should keep usable paths, or preserve the same `traces/<run_id>.json` layout.
+## Completeness, costs and reproducibility
 
-When the batch arrives, run the batch command in [README.md](README.md).
-Numerical tables can be generated before review labels arrive. This does
-not require an API key or rerunning any agent episode.
+- Both datasets have 36/36 evaluated selected episodes, 36 attempts, no retries,
+  no missing records/outcomes, no infrastructure/evaluation errors, and no recorded
+  content-filter terminations. `completed` means evaluated, not task success.
+- All 72 selected traces exist and match their episode records. Their user
+  prompts, attacker goals and fixed injected payloads match the model-specific
+  task manifest. No batch trace relocation was needed.
+- Every selected episode has input/output token counts and runtime. Cost tables
+  report median total tokens and runtime separately for clean and attacked
+  runs, with denominator six per defense/model and three per suite. All-attempt
+  totals are complete; no currency cost is inferred from token counts.
+- GPT-4.1-nano records deployment version `2025-04-14`, temperature 0.0,
+  Default content filter, 15 tool iterations and clean source revision `7803b96`.
+- GPT-5 records reasoning effort `minimal`, no explicit temperature, Default
+  content filter, 15 tool iterations, and source `5c4a39a-dirty`. **Its exact
+  deployment version is still a placeholder in the saved configuration.** Ja
+  should document that version and identify the uncommitted execution changes;
+  neither value is guessed in these reports.
+- At the reviewed source revision, recomputing each batch's configuration
+  fingerprint reproduces the recorded hashes: `20254c0d1f3e` (nano) and
+  `0f0066581e61` (GPT-5). This checks the recorded configuration/prompt/pipeline
+  inputs; it does not recover an uncommitted runner revision.
+- The fixed attacks address GPT-4 for nano and GPT-5 for the comparison model.
+  Decoding settings also differ. This is **not a controlled model-only comparison
+  under identical attack text**. Keep the two experiment reports separate.
+- De's merged review covers integration pilots and documents unwrapped tool
+  errors. It is not independent behavioral labeling of these new batch failures.
 
-## Handoff to Is and Re
+## Remaining handoff to Is/Re, then Ab
 
-Use the per-model `review_queue.csv` and `selected_cases.csv` to locate evidence.
-The GPT-5 integration failed-task run is
-`banking__user_task_13__injection_task_0__warning_boundaries__20261119T074925Z_252e`.
-The GPT-4.1-nano integration dataset contains no failed legitimate tasks.
-Smoke tests remain a separate pilot dataset and are not included here.
+1. Is and Re independently review the failed-task episodes in each model's queue.
+   The queue includes run ID, clean/attacked condition, both outcomes and trace path.
+2. Resolve disagreements and provide one row per reviewed run with
+   `run_id,reviewer,unnecessary_refusal,tool_format_failure,notes`. Labels must
+   be `yes`, `no` or `unclear`; unknown is not silently converted to `no`.
+3. Supply separate per-model CSVs (suggested paths:
+   `review/resolved_labels_preliminary.csv` and
+   `review/resolved_labels_preliminary_gpt5.csv`). Analysis intentionally rejects
+   labels whose run IDs belong to a different experiment.
+4. Ab reruns each documented command with its corresponding `--resolved-labels`
+   file, verifies failed-task coverage is 21/21 and 11/11, and hands Re the
+   completed review summaries. The numerical task/attack outcomes stay unchanged.
 
-Keep your independent labels, then supply one resolved row per reviewed run
-with the agreed `run_id,reviewer,unnecessary_refusal,tool_format_failure,notes`
-columns. Preserve uncertainty as `unclear`. The current reports show missing
-reviews as unreviewed, with unavailable refusal/tool-format rates.
+The script, numerical tables, queues and handoff are ready now. Only the
+behavioral-review aggregation requires further external input.
 
-## Validation performed
+## Pilot archive and verification
 
-- Full repository suite: 36 tests passed, plus 32 subtests.
-- All 16 existing smoke/integration pilot records exercised by analysis tests.
-- Full runner-to-analysis offline check: 36/36 scripted episodes evaluated
-  across Banking and Slack. Synthetic outputs remain outside committed study
-  reports; this check made no model API calls.
-- Generated outputs are deterministic for unchanged inputs; source results,
-  task selection, model configuration and defense code are unchanged.
+The [nano pilot report](reports/integration_gpt41nano/report.md) and
+[GPT-5 pilot report](reports/integration_gpt5/report.md) remain separate from
+the batch. Their archived trace paths are resolved without modifying raw data.
+GPT-5 pilot reproduction now uses `config/tasks_gpt5.json`, whose payloads match
+the saved traces; matching task IDs alone was insufficient to establish this.
 
-## Remaining work once inputs arrive
-
-1. Ja supplies the frozen batch and retained-attempt list.
-2. Ab runs the documented batch command and checks evaluated/missing counts,
-   paired exclusions and available measurements.
-3. Is/Re independently review the failed-task episodes and resolve labels.
-4. Ab reruns with `--resolved-labels`, checks failed-task review coverage, and
-   hands Re the final preliminary tables and selected-case list.
-
-No statistical claims beyond descriptive counts are planned for this batch.
+`python -m pytest -q` verifies the existing runner/defenses and analysis checks.
+The analysis checks cover all 16 saved pilot episodes and both real 36-episode
+batches, expected metric counts, paired differences, review queues, measurement
+availability, and rejection of the wrong attack manifest. Existing synthetic
+fixtures still test errors, retries, missing data and resolved review labels.

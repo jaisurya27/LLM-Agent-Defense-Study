@@ -18,6 +18,27 @@
         "reasoning_effort": "minimal"
       }
     ],
+    "episode_limits": [
+      {
+        "max_tool_iterations": 15
+      }
+    ],
+    "task_manifest": {
+      "benchmark_version": "v1.2.2",
+      "selection": {
+        "seed": 261,
+        "suites": [
+          "banking",
+          "slack"
+        ],
+        "user_tasks_per_suite": 3
+      },
+      "attack": {
+        "name": "important_instructions",
+        "user_name": "Emma Johnson",
+        "model_name": "GPT-5"
+      }
+    },
     "run_code_revisions": [
       "87c5d5e-dirty"
     ],
@@ -30,8 +51,8 @@
     "input_sha256": {
       "episodes": "5538761a5a4e0a9f5d06022341cd395860ec330ee216a8e288547f3ef88c7a34",
       "selection": "a954236507bb84e262278e05ba966c1dbae3b8e851cb83be8209a4a3aaa7dd8e",
-      "tasks": "d69fbe38960eedca3d7b9320c7f8867667b7411b70cbb56d36b8aae95b194186",
-      "analysis_script": "125d2085353634f96b1a8f06ef5f88efa012a4860adc62b37bab66cf464f5d46",
+      "tasks": "2acd6c74d00c75054a5dc4b2f2ae80ed2fa253ca229a603f8a223887ba2cc1b4",
+      "analysis_script": "c7e9fdfd9b93a8446b3e47259416cd1b4076a7b72e120267c5b7eeb7f4985336",
       "schema": "dd2fa5a56d1403d248c561ea954cca8b9785d64276b18d2239cda10f13974303",
       "defenses": "b38c82625aa3537e6a2bdf8452c472992658704791ae959d9a9720024e5bb77a"
     }
@@ -39,6 +60,8 @@
   "warnings": [
     "Pilot only: one user task is tested. Do not pool these episodes with the preliminary batch or claim defense effectiveness.",
     "Resolved review labels have not been supplied. Unreviewed is not no; refusal/tool-format rates remain unavailable.",
+    "Saved underlying_model is unconfirmed (gpt-5 (version: record from the Deployments page before the freeze)); obtain the exact run setting from Ja.",
+    "Saved content_filter is unconfirmed (Default (to confirm before the freeze)); obtain the exact run setting from Ja.",
     "6 stale trace paths resolved in the input folder's traces directory. Raw results were not changed; see selected_cases.csv.",
     "Run code revision is unknown or marked dirty; the exact executed source is not fully identified by a clean commit."
   ],

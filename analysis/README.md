@@ -15,6 +15,7 @@ python -m analysis.summarize \
 python -m analysis.summarize \
   --results-dir results/integration_gpt5 \
   --phase integration \
+  --tasks config/tasks_gpt5.json \
   --output analysis/reports/integration_gpt5
 ```
 
@@ -24,23 +25,40 @@ episodes, or offline records. Slack rows have zero planned pilot episodes;
 their rates are unavailable, not 0%.
 
 Smoke checks can be summarized separately with `--phase smoke` and the
-corresponding `results/smoke_*` input folder. Smoke has only Default, so
+corresponding `results/smoke_*` input folder; GPT-5 also requires
+`--tasks config/tasks_gpt5.json`. Smoke has only Default, so
 differences across all three defenses are unavailable.
 
-## Analyze the preliminary batch when Ja supplies it
+## Reproduce the two preliminary batch reports
+
+Ja supplied both real 36-episode batches on 2026-11-22. Their numerical reports
+are committed; the human review labels remain pending. Run the models separately
+with their exact task manifests:
 
 ```bash
 python -m analysis.summarize \
   --results-dir results/preliminary \
   --phase batch \
   --tasks config/tasks.json \
-  --resolved-labels review/resolved_labels.csv \
   --output analysis/reports/preliminary
+
+python -m analysis.summarize \
+  --results-dir results/preliminary_gpt5 \
+  --phase batch \
+  --tasks config/tasks_gpt5.json \
+  --output analysis/reports/preliminary_gpt5
 ```
 
-Use the exact task manifest saved with that experiment. Omit
-`--resolved-labels` until Is and Re supply their resolved labels; numeric
-outcomes can be analyzed first, while review counts remain unreviewed.
+The GPT-5 payload addresses GPT-5; the nano payload addresses GPT-4. Their
+task IDs match, but the attack text does not. Analysis now checks the manifest's
+user prompt, attacker goal and injected payload against every available selected
+trace and rejects mismatches. Do not substitute the nano manifest for GPT-5.
+
+When Is and Re supply resolved labels, add
+`--resolved-labels review/resolved_labels_preliminary.csv` to the nano command,
+and `--resolved-labels review/resolved_labels_preliminary_gpt5.csv` to the GPT-5
+command (or the actual paths provided by the reviewers). Keep each file scoped
+to its model's run IDs. Until then, review counts remain unreviewed.
 If a supplied labels file does not exist, analysis stops instead of silently
 dropping it. Rerun the same command once the missing data arrives.
 
@@ -135,10 +153,10 @@ analysis. This allows Ja to retain the original data unchanged.
 
 Reports are deterministic for unchanged inputs. `summary.json` records hashes
 of the episode file, selected-attempt list, task manifest, optional labels,
-analysis script and shared schema/defense definitions. Saved model settings
-come from the traces, not today's config. Historical `-dirty` revisions and
-unconfirmed settings remain limitations; analysis cannot reconstruct an
-uncommitted runner revision.
+analysis script and shared schema/defense definitions. Saved model settings and
+episode limits come from the traces, not today's config. Reports disclose
+unconfirmed model-version/content-filter placeholders and historical `-dirty`
+revisions; analysis cannot reconstruct an uncommitted runner revision.
 
 ## Validation
 
@@ -154,5 +172,6 @@ The explicitly synthetic fixture in `tests/fixtures/analysis/` checks known
 numerators, denominators, paired differences, medians, null handling, retries,
 missing evaluations, and resolved labels. It lives outside real results and
 is rejected by the CLI unless `--allow-synthetic` is provided. Tests also
-validate both saved real integration datasets. See [HANDOFF.md](HANDOFF.md)
-for completed deliverables and external dependencies.
+validate all saved real smoke/integration datasets and both 36-episode batches,
+including the exact expected counts and correct payload manifests. See
+[HANDOFF.md](HANDOFF.md) for numerical findings and the remaining label handoff.

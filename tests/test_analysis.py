@@ -241,7 +241,8 @@ class AnalysisTests(unittest.TestCase):
 
     def test_real_pilot_records_and_defense_differences(self):
         for model, useful, delta in [("gpt41nano", 0, 0), ("gpt5", 1, -100)]:
-            result = summarize(ROOT / f"results/integration_{model}", "integration", ROOT / "config/tasks.json")
+            tasks = ROOT / ("config/tasks_gpt5.json" if model == "gpt5" else "config/tasks.json")
+            result = summarize(ROOT / f"results/integration_{model}", "integration", tasks)
             self.assertEqual(result["metadata"]["evaluated_episodes"], 6)
             self.assertEqual(sum(r["trace_relocated"] for r in result["selected_cases"]), 6)
             default = self.row(result, "metrics", scope="combined", defense="default", metric="useful_resistance")
@@ -252,11 +253,56 @@ class AnalysisTests(unittest.TestCase):
 
     def test_smoke_stays_separate_and_has_no_paired_comparisons(self):
         for model in ("gpt41nano", "gpt5"):
-            result = summarize(ROOT / f"results/smoke_{model}", "smoke", ROOT / "config/tasks.json")
+            tasks = ROOT / ("config/tasks_gpt5.json" if model == "gpt5" else "config/tasks.json")
+            result = summarize(ROOT / f"results/smoke_{model}", "smoke", tasks)
             self.assertEqual(result["metadata"]["planned_episodes"], 2)
             self.assertEqual(result["metadata"]["evaluated_episodes"], 2)
             self.assertTrue(all(r["defense"] == "default" and r["difference_pp"] is None for r in result["metrics"]))
             self.assertTrue(all(not r["included"] for r in result["paired_cases"]))
+
+    def test_real_batches_have_complete_coverage_and_expected_counts(self):
+        # Values independently counted from the 2026-11-22 batches; order is
+        # clean completion, attacked completion, attack success, useful resistance.
+        expected = {
+            "preliminary": {"default": (3, 2, 4, 0), "warning": (4, 2, 3, 1), "warning_boundaries": (2, 2, 3, 1)},
+            "preliminary_gpt5": {"default": (6, 2, 0, 2), "warning": (6, 3, 0, 3), "warning_boundaries": (5, 3, 0, 3)},
+        }
+        metrics = ("clean_task_completion", "attacked_task_completion", "attack_success", "useful_resistance")
+        for name, counts in expected.items():
+            tasks = ROOT / ("config/tasks_gpt5.json" if name.endswith("gpt5") else "config/tasks.json")
+            result = summarize(ROOT / "results" / name, "batch", tasks)
+            self.assertEqual(result["metadata"]["evaluated_episodes"], 36)
+            self.assertEqual(result["metadata"]["selected_episodes"], 36)
+            self.assertEqual(len(result["paired_cases"]), 12)
+            self.assertTrue(all(r["included"] for r in result["paired_cases"]))
+            self.assertTrue(all(r["resolved_trace_path"] and not r["trace_relocated"] for r in result["selected_cases"]))
+            self.assertEqual(len(result["review_queue"]), 11 if name.endswith("gpt5") else 21)
+            self.assertTrue(all(r["missing_evaluation"] == r["infrastructure_error_attempts"] == r["evaluation_error_attempts"] == 0
+                                for r in result["errors"]))
+            for defense, numerators in counts.items():
+                for metric, numerator, baseline in zip(metrics, numerators, counts["default"]):
+                    r = self.row(result, "metrics", scope="combined", defense=defense, metric=metric)
+                    self.assertEqual((r["numerator"], r["denominator"], r["paired_denominator"]), (numerator, 6, 6))
+                    self.assertAlmostEqual(r["difference_pp"], 100 * (numerator - baseline) / 6)
+                    for suite in ("banking", "slack"):
+                        s = self.row(result, "metrics", scope=suite, defense=defense, metric=metric)
+                        self.assertEqual(s["denominator"], 3)
+            self.assertTrue(all(r["unreviewed"] == r["evaluated"] and r["rate"] is None for r in result["reviews"]))
+            for r in result["costs"]:
+                self.assertEqual(r["tokens_missing"], 0)
+                self.assertEqual(r["runtimes_missing"], 0)
+
+    def test_wrong_attack_manifest_is_rejected_even_when_task_ids_match(self):
+        with self.assertRaisesRegex(AnalysisError, "manifest injections differs"):
+            summarize(ROOT / "results/preliminary_gpt5", "batch", ROOT / "config/tasks.json")
+        with self.assertRaisesRegex(AnalysisError, "manifest injections differs"):
+            summarize(ROOT / "results/preliminary", "batch", ROOT / "config/tasks_gpt5.json")
+
+    def test_unconfirmed_gpt5_version_is_disclosed(self):
+        result = summarize(ROOT / "results/preliminary_gpt5", "batch", ROOT / "config/tasks_gpt5.json")
+        self.assertTrue(any("underlying_model is unconfirmed" in w for w in result["warnings"]))
+        self.assertEqual(result["metadata"]["task_manifest"]["attack"]["model_name"], "GPT-5")
+        self.assertEqual(result["metadata"]["episode_limits"], [{"max_tool_iterations": 15}])
 
 
 if __name__ == "__main__":
