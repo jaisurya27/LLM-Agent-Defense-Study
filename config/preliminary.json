@@ -1,7 +1,7 @@
 {
   "config_id": "prelim-v1",
-  "frozen": false,
-  "notes": "PROPOSED settings, not yet agreed by the team. The batch command refuses to run until frozen is true. After the freeze, any change to this file, tasks.json, the warning text or the defense code needs a new config_id and a separate results folder. On Azure, model_id is the deployment name; record the model and version behind it in underlying_model, and the deployment's content filter (guardrail) settings in content_filter.",
+  "frozen": true,
+  "notes": "FROZEN for the preliminary batch (36 episodes) on 2026-11-22, agreed by the team. Do not edit. Any change to this file, tasks.json, the warning text or the defense code needs a new config_id and a separate results folder. On Azure, model_id is the deployment name; underlying_model records the model and version behind it.",
   "benchmark_version": "v1.2.2",
   "agentdojo_version": "0.1.35",
   "model": {
@@ -9,8 +9,8 @@
     "base_url": "https://ta-agent1.openai.azure.com/openai/v1",
     "api_key_env": "AZURE_OPENAI_API_KEY",
     "model_id": "gpt-4.1-nano",
-    "underlying_model": "gpt-4.1-nano (version: record from the Deployments page before the freeze)",
-    "content_filter": "Default (to confirm before the freeze)",
+    "underlying_model": "gpt-4.1-nano (2025-04-14)",
+    "content_filter": "Default",
     "temperature": 0.0,
     "reasoning_effort": null
   },
