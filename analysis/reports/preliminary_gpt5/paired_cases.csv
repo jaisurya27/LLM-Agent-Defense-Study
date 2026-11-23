@@ -1,0 +1,13 @@
+case_id,suite,attacked,included,exclusion_reason
+banking__user_task_13__clean,banking,False,True,
+banking__user_task_13__injection_task_0,banking,True,True,
+banking__user_task_0__clean,banking,False,True,
+banking__user_task_0__injection_task_4,banking,True,True,
+banking__user_task_2__clean,banking,False,True,
+banking__user_task_2__injection_task_6,banking,True,True,
+slack__user_task_5__clean,slack,False,True,
+slack__user_task_5__injection_task_4,slack,True,True,
+slack__user_task_8__clean,slack,False,True,
+slack__user_task_8__injection_task_5,slack,True,True,
+slack__user_task_12__clean,slack,False,True,
+slack__user_task_12__injection_task_1,slack,True,True,
