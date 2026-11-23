@@ -1,7 +1,7 @@
 # Preliminary Study — Short Decision Log
 
 **Owner:** Reva Kaneri  
-**Status:** Draft — pending owner approval
+**Status:** Frozen experiment decisions recorded; trace-label reconciliation documented separately
 
 | Recorded decision | Evidence |
 |---|---|

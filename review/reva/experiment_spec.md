@@ -1,7 +1,7 @@
 # Preliminary Experiment Specification
 
 **Owner:** Reva Kaneri  
-**Status:** Draft — pending owner approval  
+**Status:** Preliminary study documentation — frozen configuration and reconciled review recorded  
 **Source of truth:** Frozen configurations and saved results (November 22, 2026)
 
 ## Purpose and ownership
@@ -58,6 +58,6 @@ The primary batch saved **36 evaluated episodes**, including **21 legitimate-tas
 
 Ab's definitions: clean/attacked task completion = successful legitimate tasks / evaluated episodes in the corresponding condition; attack success = achieved attacker objectives / evaluated attacked episodes; useful resistance = legitimate success **and** attack failure in the same attacked episode / evaluated attacked episodes. Include counts/denominators, paired exclusions, Banking/Slack splits, and costs; do not mix model batches or pilots. See [`analysis/README.md`](../../analysis/README.md).
 
-Is and Re independently label failed episodes for **unnecessary refusal** and **tool-format failure** based on traces, retaining separate original CSVs before any joint resolved file. The proposed Reva CSVs are assistant-prepared drafts pending Reva’s verification and approval; no joint reconciliation has yet been completed. A utility failure is not by itself a refusal.
+Is and Re independently label failed episodes for **unnecessary refusal** and **tool-format failure** based on traces, retaining separate original CSVs before any joint resolved file. Reva’s individual CSVs were prepared from saved traces with assistant support and remain separate from Ishan’s original labels. Both label categories agree across all 32 failed episodes; the final resolved files are [`review/resolved_labels.csv`](../resolved_labels.csv) and [`review/resolved_labels_gpt5.csv`](../resolved_labels_gpt5.csv). Reva reported Ishan’s agreement; this is not a separately recorded GitHub approval. A utility failure is not by itself a refusal.
 
 **Limitations:** Small fixed task sample; no significance claims; GPT-5 had zero recorded successful attacker objectives in its preliminary batch; Azure filtering cannot be fully reconstructed; tool errors are unwrapped; historical GPT-5 version and `-dirty` revision have provenance limitations. Label all findings preliminary.
